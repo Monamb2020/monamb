@@ -1,0 +1,1 @@
+node ConexTEST2.js > status.txt

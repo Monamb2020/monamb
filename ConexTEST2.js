@@ -65,15 +65,16 @@ function getFormattedDate(date) {
     return year + '-' + month + '-' + day;
 }
 
-function transformation(data) {
+async function transformation(data) {
 
-    data.forEach(element => {
+    await data.forEach(async element => {
         if (element.INFO_DETALLADA) {
-            element.INFO_DETALLADA.forEach(form => {
-                execute(element, form);
+            await element.INFO_DETALLADA.forEach(async form => {
+                await execute(element, form);
             });
         };
     });
+    console.log("FINALIZACION");
 }
 async function execute(element, form) {
     const client = new Client(pool)
@@ -95,11 +96,11 @@ async function execute(element, form) {
             console.log("commit");
             await client.query('COMMIT')
         } catch (e) {
-            console.log("rollback", e);
+            console.log("rollback", e.detail);
             client.query('ROLLBACK')
         }
     } finally {
-        
+        process.exit(0);
     }
 }
 
