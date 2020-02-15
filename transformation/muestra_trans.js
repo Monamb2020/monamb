@@ -1,5 +1,5 @@
 
-async function insertMuestra(data) {
+async function insertMuestra(data, pool) {
     const client = new Client(pool)
     await client.connect()
     const res = await client.query("INSERT INTO muestra(cod_punto, codigo_muestra, fecha_toma, hora_toma, responsable, fecha_analisis, tipo_muestreo, numero_verticales, numero_submuestras, intervalo_tiempo, duracion,temperatura_ambiente, caudal, metodo_caudal, color_agua, turbidez, olor, causa, material_flotante, iridiscencia, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)", data)
@@ -82,5 +82,6 @@ function transformation(element, form, pool) {
 }
 
 module.exports = {
+    transformation: transformation,
     insertMuestra: insertMuestra
 }

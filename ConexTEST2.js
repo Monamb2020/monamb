@@ -1,6 +1,9 @@
 const axios = require('axios');
 const { Client } = require('pg');
 
+const punto = require('./transformation/punto_trans');
+const muestra = require('./transformation/muestra_trans');
+
 const url = 'https://kc.kobotoolbox.org/api/v1/data/';
 const project = "399050";
 let config = {
@@ -25,7 +28,6 @@ function sendRequest(date){
     console.log("url_request", url_request);
     axios.get(url_request, config)
     .then(res => {
-        console.log("legth result", res.data.legth);
         transformation(res.data);
     })
     .catch(err => {
@@ -68,6 +70,10 @@ function transformation(data){
     data.forEach(element => {
         if (element.INFO_DETALLADA){
             element.INFO_DETALLADA.forEach(form => {
+                punto.transformation(element, form, pool);
+                muestra.transformation(element, form, pool);
+
+
                 let matriz_ = element["INFO_GENERAL/MATRIZ"];
                 if (matriz_ === "MAR"){
                     
