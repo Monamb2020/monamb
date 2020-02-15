@@ -1,30 +1,26 @@
 const { Client } = require('pg');
 
-async function insertPunto(data, pool) {
+async function insertPunto(data, client) {
     console.log("insertPunto");
-    const client = new Client(pool)
-    await client.connect()
     const res = await client.query("INSERT INTO punto(codigo, identificacion, proyecto, autoridad_ambiental, planta, vereda, municipio, departamento, latitud, longitud, altura, categoria, tipo_fu_sup, nombre_fu_sup, tipo_caudal, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)", data)
     console.log("response", res.rowCount)
-    await client.end()
+    //await client.end()
     return res;
 }
 
-async function selectPunto(idPunto, pool) {
-    const client = new Client(pool)
-    await client.connect()
+async function selectPunto(idPunto, client) {
     const res = await client.query("SELECT codigo from punto WHERE codigo = $1", [idPunto])
-    await client.end()
+    //await client.end()
     console.log("select", idPunto, res.rowCount)
     return res;
 }
 
-async function transformation(element, form, pool) {
+async function transformation(element, form, client) {
     let params2 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null];
     if (form["INFO_DETALLADA/PUNTOS_N/ID_PUNTO_NUEVO"] !== null) {
         params2[0] = form["INFO_DETALLADA/PUNTOS_N/ID_PUNTO_NUEVO"];
     }
-    const countPunto = await selectPunto(params2[0], pool);
+    const countPunto = await selectPunto(params2[0], client);
     if (countPunto.rowCount === 0) { // no exiten regitro el base de datos con el codigo especificado
         if (form["INFO_DETALLADA/PUNTOS_N/NOMBRE"] !== "") {
             params2[1] = form["INFO_DETALLADA/PUNTOS_N/NOMBRE"];
@@ -71,7 +67,7 @@ async function transformation(element, form, pool) {
             params2[15] = form["INFO_DETALLADA/PUNTOS_N/OBS_PTO_N"]
         };
         console.log(JSON.stringify(params2));
-        let statusInsert = await insertPunto(params2, pool);
+        let statusInsert = await insertPunto(params2, client);
         return statusInsert.rowCount;
     }
 }
