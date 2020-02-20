@@ -79,7 +79,9 @@ async function transformation(element, form, client) {
     if (observ_ !== "") {
         params1[20] = observ_
     }
-    params1[21] = new Date(element["end"]);
+    if (element["end"]!==""){
+        params1[21] = element["end"]
+    }
     console.log(JSON.stringify(params1));
     return insertMuestra(params1, client);
 }
