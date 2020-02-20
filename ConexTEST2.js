@@ -3,8 +3,12 @@ const { Client } = require('pg');
 
 const punto = require('./transformation/punto_trans');
 const muestra = require('./transformation/muestra_trans');
-
+const aMarina_ = require('./transformation/matrix_monitoreo_am');
+const asub_ = require('./transformation/matrix_monitoreo_as');
+const ar_ = require('./transformation/matrix_monitoreo_ar');
+const insitu_ = require('./transformation/param_trans');
 const url = 'https://kc.kobotoolbox.org/api/v1/data/';
+
 const project = "399050";
 let config = {
     headers: {
@@ -14,7 +18,7 @@ let config = {
 const pool = {
     user: 'postgres',
     host: 'localhost',
-    database: 'Monamb',
+    database: 'Monamb1',
     password: '2581161625',
     port: 5432,
 };
@@ -46,15 +50,7 @@ async function selectLastestDate() {
     await client.end()
 }
 
-/*
-async function insertInsitu(data){
-    const client = new Client(pool)
-    await client.connect()
-    const res = await client.query("INSERT INTO insitu(nombre, condicion_deteccion, resultado, observaciones,cod_muesta) VALUES ($1, $2, $3, $4, $5)", data)
-    console.log("response", res)
-    await client.end()
-}
-*/
+
 
 function getFormattedDate(date) {
     var year = date.getFullYear();
@@ -84,23 +80,32 @@ async function execute(element, form) {
         try {
             await punto.transformation(element, form, client);
             await muestra.transformation(element, form, client);
-    
+
             let matriz_ = element["INFO_GENERAL/MATRIZ"];
             if (matriz_ === "MAR") {
-    
-            } else if (matriz_ === "ASUB") {
-    
-            } else if (matriz_ === "ARND" || matriz_ === "ARD") {
-    
+                await aMarina_.transformation(element, form, client);
             }
+            if (matriz_ === "ASUB") {
+                await asub_.transformation(element, form, client);
+            }
+            if (matriz_ === "ARND") {
+                await ar_.transformation(element, form, client);
+            }
+            if (matriz_ === "ARD") {
+                await ar_.transformation(element, form, client);
+            }
+
+
+
+            await insitu_.transformation(element, form, client);
             console.log("commit");
             await client.query('COMMIT')
         } catch (e) {
-            console.log("rollback", e.detail);
+            console.log("rollback", e);
             client.query('ROLLBACK')
         }
     } finally {
-        process.exit(0);
+        //process.exit(0);
     }
 }
 
