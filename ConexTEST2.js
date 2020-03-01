@@ -94,9 +94,6 @@ async function execute(element, form) {
             if (matriz_ === "ARD") {
                 await ar_.transformation(element, form, client);
             }
-
-
-
             await insitu_.transformation(element, form, client);
             console.log("commit");
             await client.query('COMMIT')
