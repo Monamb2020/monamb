@@ -7,6 +7,9 @@ const aMarina_ = require('./transformation/matrix_monitoreo_am');
 const asub_ = require('./transformation/matrix_monitoreo_as');
 const ar_ = require('./transformation/matrix_monitoreo_ar');
 const insitu_ = require('./transformation/param_trans');
+const Counter = require('./utils/counter');
+const fotos_lab = require('./transformation/fotos_lab');
+
 const url = 'https://kc.kobotoolbox.org/api/v1/data/';
 
 const project = "399050";
@@ -18,7 +21,7 @@ let config = {
 const pool = {
     user: 'postgres',
     host: 'localhost',
-    database: 'Monamb1',
+    database: 'Monamb_10',
     password: '2581161625',
     port: 5432,
 };
@@ -42,7 +45,7 @@ function sendRequest(date) {
 async function selectLastestDate() {
     const client = new Client(pool)
     await client.connect()
-    const res = await client.query('SELECT max(fecha_actualizacion) as ultima_actualizacion from muestra', [])
+    const res = await client.query('SELECT max(fecha_actualizacion) as ultima_actualizacion from laboratorio_muestra', [])
     console.log(res.rows)
     let fecha_ultima_actualizacion = res.rows[0].ultima_actualizacion;
     fecha_ultima_actualizacion.setDate(fecha_ultima_actualizacion.getDate() + 1);
@@ -50,7 +53,21 @@ async function selectLastestDate() {
     await client.end()
 }
 
+async function selectIdLab() {
+    const client = new Client(pool)
+    await client.connect()
+    const res = await client.query("select max(id) as id from laboratorio_insitu", []);
+    await client.end()
+    return res.rows[0].id;
+}
 
+async function selectIdImage() {
+    const client = new Client(pool)
+    await client.connect()
+    const res = await client.query("select max(id) as id from laboratorio_fotografia", []);
+    await client.end()
+    return res.rows[0].id;
+}
 
 function getFormattedDate(date) {
     var year = date.getFullYear();
@@ -62,10 +79,16 @@ function getFormattedDate(date) {
 }
 
 async function transformation(data) {
-
+    let secuential = await selectIdLab();
+    let secuential2 = await selectIdImage();
+    console.log("secuential - Id", secuential);
+    let count = new Counter(secuential);
+    let count2 = new Counter(secuential2);
     await data.forEach(async element => {
         if (element.INFO_DETALLADA) {
             await element.INFO_DETALLADA.forEach(async form => {
+                element.secuential = count;
+                element.secuential2=count2;
                 await execute(element, form);
             });
         };
@@ -95,6 +118,7 @@ async function execute(element, form) {
                 await ar_.transformation(element, form, client);
             }
             await insitu_.transformation(element, form, client);
+            await fotos_lab.transformation(element, form, client, config);
             console.log("commit");
             await client.query('COMMIT')
         } catch (e) {
@@ -102,8 +126,11 @@ async function execute(element, form) {
             client.query('ROLLBACK')
         }
     } finally {
-        //process.exit(0);
+        
     }
 }
-
+process.on('unhandledRejection', (err) => { 
+    console.error(err);
+    process.exit(1);
+  })
 selectLastestDate();

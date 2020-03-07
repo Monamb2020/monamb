@@ -1,13 +1,13 @@
 const { Client } = require('pg');
 
 async function insertAguaMarina(data, client){
-    const res = await client.query("INSERT INTO agua_marina(cod_punto, temporada, profundidad_muestra, estado, profundidad_disco_secchi, observaciones) VALUES ($1, $2, $3, $4, $5, $6)", data)
+    const res = await client.query("INSERT INTO proyectos_aguamarina(cod_punto_id, temporada_id, profundidad_muestra, estado_id, profundidad_disco_secchi, observaciones) VALUES ($1, $2, $3, $4, $5, $6)", data)
     console.log("response", res.rowCount)
     //await client.end()
     return res;
 }
 async function selectPunto(idPunto, client) {
-    const res = await client.query("SELECT cod_punto from agua_marina WHERE cod_punto = $1", [idPunto])
+    const res = await client.query("SELECT cod_punto_id from proyectos_aguamarina WHERE cod_punto_id = $1", [idPunto])
     console.log("select", idPunto, res.rowCount)
     return res;
 }

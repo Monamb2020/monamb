@@ -2,12 +2,12 @@
 const { Client } = require('pg');
 
 async function insertAguaResidual(data, client){
-    const res = await client.query("INSERT INTO agua_residual(cod_punto, tipo, horas_descarga, dias_descarga, pretratamiento, descrip_pt, tratamiento_primario, descrip_tp, tratamiento_secundario, descrip_ts, tratamiento_terciario, descrip_tt, otro_tratamiento, descrip_ot, fecha_mantenimiento, destino_final, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)", data)
+    const res = await client.query("INSERT INTO proyectos_aguaresidual(cod_punto_id, tipo_id, horas_descarga, dias_descarga, pretratamiento, descrip_pt, tratamiento_primario, descrip_tp, tratamiento_secundario, descrip_ts, tratamiento_terciario, descrip_tt, otro_tratamiento, descrip_ot, fecha_mantenimiento, destino_final_id, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)", data)
     console.log("response", res.rowCount)
     return res;
 }
 async function selectPunto(idPunto, client) {
-    const res = await client.query("SELECT cod_punto from agua_residual WHERE cod_punto = $1", [idPunto])
+    const res = await client.query("SELECT cod_punto_id from proyectos_aguaresidual WHERE cod_punto_id = $1", [idPunto])
     console.log("select", idPunto, res.rowCount)
     return res;
 }
@@ -26,9 +26,9 @@ async function transformation(element, form, client) {
         if (form["INFO_DETALLADA/AR/TIPO_AR"]!==""){
             let matriz_ = await element["INFO_GENERAL/MATRIZ"];
             if (matriz_ ==="ARD"){
-                params5[1]="d"
+                params5[1]="D"
             }else{
-                params5[1]="i"
+                params5[1]="I"
             }
         }
         if (form["INFO_DETALLADA/AR/DESC_H"]!==""){
@@ -71,7 +71,7 @@ async function transformation(element, form, client) {
             params5[14] = new Date(form["INFO_DETALLADA/AR/FECHA_MANT"])
         }
         if (form["INFO_DETALLADA/AR/DESTINO_FINAL"]!==""){
-            params5[15] = form["INFO_DETALLADA/AR/DESTINO_FINAL"].toLowerCase()
+            params5[15] = form["INFO_DETALLADA/AR/DESTINO_FINAL"]
         }
         if (form["INFO_DETALLADA/AR/OBS_AR"]!==""){
             params5[16]= form["INFO_DETALLADA/AR/OBS_AR"]
