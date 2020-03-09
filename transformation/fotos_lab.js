@@ -5,7 +5,7 @@ const url_base_image = "https://kc.kobotoolbox.org/media/original?media_file=mon
 const path="C:/Users/User/Documents/proyecto-node/imgs/";
 
 async function insertImg(data, client){
-    const res = await client.query("INSERT INTO laboratorio_fotografia(id, panoramica, caudal, muestra, recipiente) VALUES ($1, $2, $3, $4, $5)", data)
+    const res = await client.query("INSERT INTO laboratorio_fotografia(cod_muestra_id, panoramica, caudal, muestra, recipiente) VALUES ($1, $2, $3, $4, $5)", data)
     console.log("response", res.rowCount)
     return res;
 }
@@ -15,7 +15,7 @@ async function transformation(element, form, client, config) {
 
     })
     let params9 = [null, null, null, null, null]; //Fotografia
-    params9[0]= element.secuential2.getCounter()
+    params9[0]= form["INFO_DETALLADA/MUESTRA/COD_MUESTRA"];
     let folder = form["INFO_DETALLADA/MUESTRA/COD_MUESTRA"];
     if (form["INFO_DETALLADA/MUESTRA/FOTO_PANORAMICA"] && form["INFO_DETALLADA/MUESTRA/FOTO_PANORAMICA"]!==""){
         params9[1] = form["INFO_DETALLADA/MUESTRA/FOTO_PANORAMICA"];

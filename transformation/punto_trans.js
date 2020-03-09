@@ -68,7 +68,10 @@ async function transformation(element, form, client) {
         };
         console.log(JSON.stringify(params2));
         let statusInsert = await insertPunto(params2, client);
-        await client.query ('UPDATE home_punto set geom = (ST_SetSRID(ST_MakePoint($1,$2),4686)) WHERE codigo = $3', [params2[9],params2[8],params2[0]])
+        await client.query ('UPDATE home_punto set geom = (ST_SetSRID(ST_MakePoint($1,$2),4686)) WHERE codigo = $3', [params2[9],params2[8],params2[0]]);
+        await client.query ('UPDATE home_punto set area_hidrografica_id = (select home_areashidrograficas.cod_ah from home_areashidrograficas inner join home_punto on st_intersects (home_areashidrograficas.geom, home_punto.geom) where home_punto.codigo = $1)', [params2[0]]);
+        await client.query ('UPDATE home_punto set zona_hidrografica_id = (select home_areashidrograficas.cod_zh from home_areashidrograficas inner join home_punto on st_intersects (home_areashidrograficas.geom, home_punto.geom) where home_punto.codigo = $1)', [params2[0]]);
+        await client.query ('UPDATE home_punto set subzona_hidrografica_id = (select home_areashidrograficas.cod_szh from home_areashidrograficas inner join home_punto on st_intersects (home_areashidrograficas.geom, home_punto.geom) where home_punto.codigo = $1)', [params2[0]]) ;       
         return statusInsert.rowCount;
     }
 }

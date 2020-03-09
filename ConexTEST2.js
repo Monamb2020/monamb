@@ -21,7 +21,7 @@ let config = {
 const pool = {
     user: 'postgres',
     host: 'localhost',
-    database: 'Monamb_10',
+    database: 'PRUEBAS_03',
     password: '2581161625',
     port: 5432,
 };
@@ -61,14 +61,6 @@ async function selectIdLab() {
     return res.rows[0].id;
 }
 
-async function selectIdImage() {
-    const client = new Client(pool)
-    await client.connect()
-    const res = await client.query("select max(id) as id from laboratorio_fotografia", []);
-    await client.end()
-    return res.rows[0].id;
-}
-
 function getFormattedDate(date) {
     var year = date.getFullYear();
     var month = (1 + date.getMonth()).toString();
@@ -80,15 +72,12 @@ function getFormattedDate(date) {
 
 async function transformation(data) {
     let secuential = await selectIdLab();
-    let secuential2 = await selectIdImage();
     console.log("secuential - Id", secuential);
     let count = new Counter(secuential);
-    let count2 = new Counter(secuential2);
     await data.forEach(async element => {
         if (element.INFO_DETALLADA) {
             await element.INFO_DETALLADA.forEach(async form => {
                 element.secuential = count;
-                element.secuential2=count2;
                 await execute(element, form);
             });
         };
