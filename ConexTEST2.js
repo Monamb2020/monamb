@@ -90,7 +90,9 @@ async function execute(element, form) {
     try {
         await client.query('BEGIN')
         try {
-            await punto.transformation(element, form, client);
+            if (form["INFO_DETALLADA/PUNTOS_N/ID_PUNTO_NUEVO"] &&form["INFO_DETALLADA/PUNTOS_N/ID_PUNTO_NUEVO"]!==""){
+                await punto.transformation(element, form, client);
+            }
             await muestra.transformation(element, form, client);
 
             let matriz_ = element["INFO_GENERAL/MATRIZ"];
